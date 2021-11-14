@@ -6,14 +6,17 @@ from rouge_score import rouge_scorer
 from wordnet import wordnet
 import csv
 
-
 MODEL_PATH = "./training/bart_enwiki-kw_summary-2d8df:ROUTINE::1:10000"
 e = Engine(model_path=MODEL_PATH)
 
-with open("./validation_wordnet/validation_subset.json", "r") as df:
-    raw_validation_data = json.load(df)
+validation_data_originals = []
+print("Caching originals data...")
+for i in tqdm(range(4,5)):
+    filename = f"./data/enwiki-parsed-long-oc-MD{i}.json"
+    with open(filename, "r") as df:
+        validation_data_originals = validation_data_originals + json.load(df)
 
-pairs = [[(i["title"], i["context"]), i["target"]] for i in raw_validation_data]
+pairs = [[(i["title"], i["context"]), i["target"]] for i in validation_data_originals]
 
 collected_pairs = []
 for sample in pairs:
@@ -33,11 +36,13 @@ rougel_prec = []
 rougel_recc = []
 rougel_fm = []
 
+# 95
+
 scorer = rouge_scorer.RougeScorer(['rouge1', 'rougeL'], use_stemmer=True)
 
 for sample in tqdm(collected_pairs):
     # Get output and compare with results
-    output = e.execute(sample[0][0], sample[0][0], num_beams=2, min_length=10)
+    output = e.execute(sample[0][0], sample[0][1], num_beams=5, min_length=10)
     results = [scorer.score(i, output) for i in sample[1][1]]
 
     # get synsyet with highest scoreso
