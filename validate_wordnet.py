@@ -36,14 +36,17 @@ rougel_prec = []
 rougel_recc = []
 rougel_fm = []
 
-# 95
+sample = collected_pairs[97]
+output = e.execute(sample[0][0], sample[0][1], num_beams=2, min_length=10)
+sample
+print(output)
 
 scorer = rouge_scorer.RougeScorer(['rouge1', 'rougeL'], use_stemmer=True)
 
 for sample in tqdm(collected_pairs):
     # Get output and compare with results
-    output = e.execute(sample[0][0], sample[0][1], num_beams=5, min_length=10)
-    results = [scorer.score(i, output) for i in sample[1][1]]
+    # output = e.execute(sample[0][0], sample[0][1], num_beams=2, min_length=10)
+    results = [scorer.score(i, sample[1][0]) for i in sample[1][1]]
 
     # get synsyet with highest scoreso
     # rouge1
@@ -54,7 +57,7 @@ for sample in tqdm(collected_pairs):
     # rougel
     results_rougel = [i["rougeL"] for i in results]
     results_rougel.sort(key=lambda x: (x.precision+x.recall+x.fmeasure)/3)
-    rougel = results_rouge1[-1]
+    rougel = results_rougel[-1]
 
     # append results
     rouge1_prec.append(rouge1.precision)
@@ -65,17 +68,16 @@ for sample in tqdm(collected_pairs):
     rougel_recc.append(rougel.recall)
     rougel_fm.append(rougel.fmeasure)
 
-sum(rouge1_prec)/len(rouge1_prec) # 0.17263
-sum(rouge1_recc)/len(rouge1_recc) # 0.22024
-sum(rouge1_fm)/len(rouge1_fm)     # 0.17347
+sum(rouge1_prec)/len(rouge1_prec) # 0.21870
+sum(rouge1_recc)/len(rouge1_recc) # 0.27794
+sum(rouge1_fm)/len(rouge1_fm)     # 0.22116
                                     
-sum(rougel_prec)/len(rougel_prec) # 0.17264
-sum(rougel_recc)/len(rougel_recc) # 0.22024
-sum(rougel_fm)/len(rougel_fm)     # 0.17347
+sum(rougel_prec)/len(rougel_prec) # 0.18330
+sum(rougel_recc)/len(rougel_recc) # 0.24114
+sum(rougel_fm)/len(rougel_fm)     # 0.18879
 
 
-    # title.append(i["title"])
-#     context.append(i["context"])
+    # title.append(i["18879"])
 #     model_output.append(output)
 #     desired_output.append(i["target"])
 
@@ -86,7 +88,4 @@ sum(rougel_fm)/len(rougel_fm)     # 0.17347
 #     rougel_prec.append(results["rougeL"].precision)
 #     rougel_recc.append(results["rougeL"].recall)
 #     rougel_fm.append(results["rougeL"].fmeasure)
-
-
-
 
